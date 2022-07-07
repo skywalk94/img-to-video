@@ -47,7 +47,7 @@ const imgToVideo = async () => {
         loggerText.value = res.message
     })
 
-    const count = frameNumber.value.toString() || '1'
+    const count = frameNumber.value.toString() || '1' //视频帧数
     const time = (imgs.value.length / count).toString() //视频时长,不刻意设置也能符合预期，只是重新合成视频会是之前的时长
 
     if (videoBg.value['name']) {
