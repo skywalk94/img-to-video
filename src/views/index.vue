@@ -8,7 +8,10 @@
             <input class="form-input" v-model="frameNumber" type="number" placeholder="设置帧数(默认1)">
         </div>
         <p class="text" v-if="loggerText">{{ isFinish ? "合成视频完成" : loggerText }}</p>
-        <video class="main" :src="videoUrl" controls v-if="videoUrl"></video>
+        <template v-if="videoUrl">
+            <video class="main" :src="videoUrl" controls></video>
+            <button class="download" @click="downloadVideo">下载视频</button>
+        </template>
     </div>
 </template>
 <script setup>
@@ -59,6 +62,23 @@ const imgToVideo = async () => {
     const data = ffmpeg.FS('readFile', 'video.mp4')
     videoUrl.value = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }))
 }
+
+const downloadVideo = () => {
+    const request = new XMLHttpRequest()
+    request.open('GET', videoUrl.value)
+    request.responseType = 'blob'
+    request.onload = (res) => {
+        if (res.target.status == 200) {
+            const url = window.URL.createObjectURL(res.currentTarget.response)
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', `${new Date().getTime()}.mp4`)
+            link.click()
+        }
+    }
+    request.send()
+}
+
 </script>
 <style lang="less">
 .container {
@@ -113,6 +133,16 @@ const imgToVideo = async () => {
 .main {
     max-width: 350px;
     margin-top: 35px;
+}
+
+.download {
+    border: 1px solid #f50057;
+    color: #f50057;
+    font-size: 14px;
+    border-radius: 4px;
+    height: 36px;
+    padding: 5px 15px;
+    margin-top: 10px;
 }
 
 .text {
