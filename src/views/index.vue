@@ -2,7 +2,7 @@
     <div class="container">
         <UploadFile @change="changeFile" />
         <div class="form">
-            <button @click="imgToVideo" class="form-btn" :disabled="imgs.length > 0 && isFinish ? false : true">
+            <button @click="imgToVideo" class="form-btn" :disabled="imgs.length > 0 ? false : true">
                 {{ imgs.length > 0 ? "合成视频" : "☝️请上传(PNG)图片" }}
             </button>
             <input class="form-input" v-model="frameNumber" type="number" placeholder="设置帧数(默认1)">
@@ -54,8 +54,9 @@ const imgToVideo = async () => {
     const time = (imgs.value.length / count).toString() //视频时长,不刻意设置也能符合预期，只是重新合成视频会是之前的时长
 
     if (videoBg.value['name']) {
-        ffmpeg.FS('writeFile', videoBg.value.name, await fetchFile(videoBg.value))
-        await ffmpeg.run('-r', count, '-f', 'image2', '-i', '%d.png', '-i', videoBg.value.name, '-t', time, 'video.mp4')
+        const videoBgName = encodeURI(videoBg.value.name) //处理中文命名的音乐文件，会报错
+        ffmpeg.FS('writeFile', videoBgName, await fetchFile(videoBg.value))
+        await ffmpeg.run('-r', count, '-f', 'image2', '-i', '%d.png', '-i', videoBgName, '-t', time, 'video.mp4')
     } else {
         await ffmpeg.run('-r', count, '-f', 'image2', '-i', '%d.png', '-t', time, 'video.mp4')
     }
